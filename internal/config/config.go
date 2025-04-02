@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
-	ServerAdress          string `env:"SERVER_ADDRESS"`
-	DatabaseDsn           string `env:"DATABASE_DSN"`
+	ServerAdress          string `env:"RUN_ADDRESS"`
+	DatabaseDsn           string `env:"DATABASE_URI"`
 	AccurualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
