@@ -34,7 +34,6 @@ func NewConfig() Config {
 	}
 
 	flag.StringVar(&conf.ServerAdress, "a", "localhost:8080", "server address")
-	fmt.Println(":::::::::Database DSN!!!!::::")
-	fmt.Println(conf.DatabaseDsn)
+
 	return conf
 }

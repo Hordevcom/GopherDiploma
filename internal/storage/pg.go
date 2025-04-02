@@ -31,7 +31,7 @@ func NewPGDB(logger logging.Logger) *PGDB {
 }
 
 func InitMigrations(logger zap.SugaredLogger, conf config.Config) {
-	logger.Infow("Start migrations")
+	logger.Infow("Start migrations", conf.DatabaseDsn)
 	db, err := sql.Open("pgx", conf.DatabaseDsn)
 
 	if err != nil {
