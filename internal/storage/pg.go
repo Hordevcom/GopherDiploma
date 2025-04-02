@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/Hordevcom/GopherDiploma/internal/config"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -29,9 +30,9 @@ func NewPGDB(logger logging.Logger) *PGDB {
 	return &PGDB{logger: logger, DB: db}
 }
 
-func InitMigrations(logger zap.SugaredLogger) {
+func InitMigrations(logger zap.SugaredLogger, conf config.Config) {
 	logger.Infow("Start migrations")
-	db, err := sql.Open("pgx", "postgres://postgres:1@localhost:5432/postgres")
+	db, err := sql.Open("pgx", conf.DatabaseDsn)
 
 	if err != nil {
 		logger.Fatalw("Error with connection to DB: ", err)
