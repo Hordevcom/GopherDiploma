@@ -3,22 +3,24 @@ package main
 import (
 	"net/http"
 
-	"github.com/Hordevcom/GopherDiploma/internal/handlers/routes"
+	"github.com/Hordevcom/GopherDiploma/internal/handlers"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
+	"github.com/Hordevcom/GopherDiploma/internal/routes"
 )
 
 func main() {
 
 	logger := logging.NewLogger()
-	router := routes.NewRouter()
+	handler := handlers.NewHandler()
+	router := routes.NewRouter(*logger, *handler)
 
 	server := &http.Server{
 		Addr:    "localhost:8080",
 		Handler: router,
 	}
 
-	logger.Infow("Start server", "addr: ", server.Addr)
+	logger.Logger.Infow("Start server", "addr: ", server.Addr)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Fatalw("create server err: ", err)
+		logger.Logger.Fatalw("create server err: ", err)
 	}
 }

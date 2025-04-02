@@ -8,7 +8,7 @@ import (
 )
 
 type Logger struct {
-	logger zap.SugaredLogger
+	Logger zap.SugaredLogger
 }
 
 type ResponseData struct {
@@ -21,7 +21,7 @@ type loggingResponseWriter struct {
 	responseData *ResponseData
 }
 
-func NewLogger() zap.SugaredLogger {
+func NewLogger() *Logger {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
@@ -29,7 +29,9 @@ func NewLogger() zap.SugaredLogger {
 
 	sugar := *logger.Sugar()
 
-	return sugar
+	return &Logger{
+		Logger: sugar,
+	}
 }
 
 func (r *loggingResponseWriter) Write(b []byte) (int, error) {
@@ -59,7 +61,7 @@ func (l *Logger) WithLogging(h http.Handler) http.Handler {
 		h.ServeHTTP(&lw, r)
 
 		duration := time.Since(start)
-		l.logger.Infoln(
+		l.Logger.Infoln(
 			"uri", r.RequestURI,
 			"method", r.Method,
 			"duration", duration,
