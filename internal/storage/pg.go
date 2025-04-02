@@ -2,10 +2,15 @@ package storage
 
 import (
 	"context"
+	"database/sql"
+	"path/filepath"
+	"runtime"
 
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose"
+	"go.uber.org/zap"
 )
 
 type PGDB struct {
@@ -22,4 +27,23 @@ func NewPGDB(logger logging.Logger) *PGDB {
 	}
 
 	return &PGDB{logger: logger, DB: db}
+}
+
+func InitMigrations(logger zap.SugaredLogger) {
+	logger.Infow("Start migrations")
+	db, err := sql.Open("pgx", "postgres://postgres:1@localhost:5432/postgres")
+
+	if err != nil {
+		logger.Fatalw("Error with connection to DB: ", err)
+	}
+
+	defer db.Close()
+
+	_, filename, _, _ := runtime.Caller(0)
+	migrationsPath := filepath.Join(filepath.Dir(filename), "migrations")
+
+	err = goose.Up(db, migrationsPath)
+	if err != nil {
+		logger.Fatalw("Error with migrations: ", err)
+	}
 }
