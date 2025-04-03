@@ -26,11 +26,7 @@ func (p *PGDB) CheckUsernameLogin(ctx context.Context, username string) bool {
 	row := p.DB.QueryRow(ctx, query, user)
 	row.Scan(&user)
 
-	if user == "" {
-		return true
-	}
-
-	return false
+	return user != ""
 }
 
 func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error {
