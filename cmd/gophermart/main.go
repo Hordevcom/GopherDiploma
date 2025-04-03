@@ -14,7 +14,8 @@ func main() {
 
 	logger := logging.NewLogger()
 	conf := config.NewConfig()
-	handler := handlers.NewHandler()
+	DB := storage.NewPGDB(*logger)
+	handler := handlers.NewHandler(*DB)
 	router := routes.NewRouter(*logger, *handler)
 
 	server := &http.Server{

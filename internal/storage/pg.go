@@ -19,6 +19,37 @@ type PGDB struct {
 	DB     *pgxpool.Pool
 }
 
+func (p *PGDB) CheckUsernameLogin(ctx context.Context, username string) bool {
+	var user string
+
+	query := `SELECT username FROM users WHERE username = $1`
+	row := p.DB.QueryRow(ctx, query, user)
+	row.Scan(&user)
+
+	if user == "" {
+		return true
+	}
+
+	return false
+}
+
+func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error {
+	query := `INSERT INTO users (username, user_password)
+				VALUES ($1, $2) ON CONFLICT (username) DO NOTHING`
+
+	result, err := p.DB.Exec(ctx, query, username, password)
+
+	if rows := result.RowsAffected(); rows == 0 {
+		return nil
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewPGDB(logger logging.Logger) *PGDB {
 	db, err := pgxpool.New(context.Background(), "postgres://postgres:1@localhost:5432/postgres")
 
