@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/auth"
@@ -23,6 +24,8 @@ func (h *Handler) UserRegister(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	fmt.Println(user)
 
 	// check login in DB if already exist
 	if exist := h.DB.CheckUsernameLogin(r.Context(), user.Username); exist {
