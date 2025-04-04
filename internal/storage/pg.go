@@ -19,11 +19,21 @@ type PGDB struct {
 	DB     *pgxpool.Pool
 }
 
+func (p *PGDB) GetUserPassword(ctx context.Context, username string) string {
+	var password string
+
+	query := `SELECT user_password FROM users WHERE username = $1`
+	row := p.DB.QueryRow(ctx, query, username)
+	row.Scan(&password)
+
+	return password
+}
+
 func (p *PGDB) CheckUsernameLogin(ctx context.Context, username string) bool {
 	var user string
 
 	query := `SELECT username FROM users WHERE username = $1`
-	row := p.DB.QueryRow(ctx, query, user)
+	row := p.DB.QueryRow(ctx, query, username)
 	row.Scan(&user)
 
 	return user != ""

@@ -12,6 +12,7 @@ func NewRouter(logger logging.Logger, handler handlers.Handler) *chi.Mux {
 	router.Use(logger.WithLogging)
 
 	router.Post("/api/user/register", handler.UserRegister)
+	router.Post("/api/user/login", handler.UserLogin)
 
 	return router
 }

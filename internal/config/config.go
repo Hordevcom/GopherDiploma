@@ -26,7 +26,7 @@ func NewConfig() Config {
 	}
 
 	if conf.DatabaseDsn == "" {
-		flag.StringVar(&conf.DatabaseDsn, "d", "", "database dsn") //"postgres://postgres:1@localhost:5432/postgres"
+		flag.StringVar(&conf.DatabaseDsn, "d", "postgres://postgres:1@localhost:5432/postgres", "database dsn") //"postgres://postgres:1@localhost:5432/postgres"
 	}
 
 	if conf.AccurualSystemAddress == "" {
@@ -34,6 +34,5 @@ func NewConfig() Config {
 	}
 
 	flag.StringVar(&conf.ServerAdress, "a", "localhost:8080", "server address")
-
 	return conf
 }
