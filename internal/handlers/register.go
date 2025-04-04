@@ -37,6 +37,7 @@ func (h *Handler) UserRegister(w http.ResponseWriter, r *http.Request) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
 	if err != nil {
+		fmt.Printf("err: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -44,6 +45,7 @@ func (h *Handler) UserRegister(w http.ResponseWriter, r *http.Request) {
 	err = h.DB.AddUserToDB(r.Context(), user.Username, string(hashedPassword))
 
 	if err != nil {
+		fmt.Printf("err: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
