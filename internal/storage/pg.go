@@ -3,6 +3,8 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -40,13 +42,15 @@ func (p *PGDB) CheckUsernameLogin(ctx context.Context, username string) bool {
 }
 
 func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error {
+	fmt.Printf("user: %v, password: %v", username, password)
 	query := `INSERT INTO users (username, user_password)
 				VALUES ($1, $2) ON CONFLICT (username) DO NOTHING`
 
 	result, err := p.DB.Exec(ctx, query, username, password)
 
 	if rows := result.RowsAffected(); rows == 0 {
-		return nil
+		fmt.Println("!!!!!!No data added!!!!!!")
+		return errors.New("no update")
 	}
 
 	if err != nil {

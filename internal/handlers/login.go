@@ -32,7 +32,6 @@ func (h *Handler) UserLogin(w http.ResponseWriter, r *http.Request) {
 	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(user.Password))
 
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Wrong login or password", http.StatusUnauthorized)
 		return
 	}
