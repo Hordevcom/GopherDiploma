@@ -65,8 +65,8 @@ func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error
 	return nil
 }
 
-func NewPGDB(logger logging.Logger) *PGDB {
-	db, err := pgxpool.New(context.Background(), "postgres://postgres:1@localhost:5432/postgres")
+func NewPGDB(conf config.Config, logger logging.Logger) *PGDB {
+	db, err := pgxpool.New(context.Background(), conf.DatabaseDsn)
 
 	if err != nil {
 		logger.Logger.Errorw("Problem with connecting to db: ", err)
