@@ -22,7 +22,7 @@ func NewConfig() Config {
 	}
 
 	if conf.DatabaseDsn != "" && conf.ServerAdress != "" && conf.AccurualSystemAddress != "" {
-		fmt.Println(conf.DatabaseDsn)
+		fmt.Printf("env: %v", conf.DatabaseDsn)
 		return conf
 	}
 
@@ -38,6 +38,6 @@ func NewConfig() Config {
 
 	flag.Parse()
 
-	fmt.Println(conf.DatabaseDsn)
+	fmt.Printf("flag: %v", conf.DatabaseDsn)
 	return conf
 }
