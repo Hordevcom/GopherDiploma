@@ -73,6 +73,13 @@ func NewPGDB(logger logging.Logger) *PGDB {
 		return nil
 	}
 
+	err = db.Ping(context.Background())
+
+	if err != nil {
+		logger.Logger.Errorw("Problem with ping to db: ", err)
+		return nil
+	}
+
 	return &PGDB{logger: logger, DB: db}
 }
 
