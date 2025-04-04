@@ -34,5 +34,7 @@ func NewConfig() Config {
 	}
 
 	flag.StringVar(&conf.ServerAdress, "a", "localhost:8080", "server address")
+
+	flag.Parse()
 	return conf
 }
