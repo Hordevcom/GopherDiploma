@@ -22,6 +22,7 @@ func NewConfig() Config {
 	}
 
 	if conf.DatabaseDsn != "" && conf.ServerAdress != "" && conf.AccurualSystemAddress != "" {
+		fmt.Println(conf.DatabaseDsn)
 		return conf
 	}
 
@@ -36,5 +37,7 @@ func NewConfig() Config {
 	flag.StringVar(&conf.ServerAdress, "a", "localhost:8080", "server address")
 
 	flag.Parse()
+
+	fmt.Println(conf.DatabaseDsn)
 	return conf
 }
