@@ -20,7 +20,7 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := r.Cookie("token")
+	cookie, _ := r.Cookie("token")
 	user := auth.GetUsername(cookie.Value)
 	order, username, err := h.DB.GetOrderAndUser(r.Context(), string(body))
 
