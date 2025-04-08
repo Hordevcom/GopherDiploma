@@ -60,6 +60,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
 		}
 		next.ServeHTTP(w, r)
 	})
