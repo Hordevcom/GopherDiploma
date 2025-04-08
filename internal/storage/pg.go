@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/config"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
@@ -18,6 +19,26 @@ import (
 type PGDB struct {
 	logger logging.Logger
 	DB     *pgxpool.Pool
+}
+
+func (p *PGDB) GetOrderAndUser(ctx context.Context, order string) (string, string, error) {
+	var userOrder string
+	var username string
+
+	query := `SELECT number, username FROM orders WHERE number = $1`
+	row := p.DB.QueryRow(ctx, query, order)
+	err := row.Scan(&userOrder, &username)
+
+	return userOrder, username, err
+}
+
+func (p *PGDB) AddOrderToDB(ctx context.Context, order string, username string) error {
+	query := `INSERT INTO orders (number, uploaded_at, username)
+				VALUES ($1, $2, $3) ON CONFLICT (number) DO NOTHING`
+
+	_, err := p.DB.Exec(ctx, query, order, time.Now(), username)
+
+	return err
 }
 
 func (p *PGDB) GetUserPassword(ctx context.Context, username string) string {
@@ -47,8 +68,6 @@ func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error
 				VALUES ($1, $2) ON CONFLICT (username) DO NOTHING
 				RETURNING username`
 
-	//result, err := p.DB.Exec(ctx, query, username, password)
-
 	err := p.DB.QueryRow(ctx, query, username, password).Scan(&insertedUser)
 
 	if err != nil {
@@ -56,11 +75,6 @@ func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error
 	}
 
 	fmt.Printf("New user in base: %v", insertedUser)
-
-	// if rows := result.RowsAffected(); rows == 0 {
-	// 	fmt.Println("!!!!!!No data added!!!!!!")
-	// 	return errors.New("no update")
-	// }
 
 	return nil
 }

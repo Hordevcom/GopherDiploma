@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/auth"
@@ -18,11 +17,8 @@ func (h *Handler) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(user)
-
 	// check user in database
 	password := h.DB.GetUserPassword(r.Context(), user.Username)
-	fmt.Println(password)
 
 	if password == "" {
 		http.Error(w, "Wrong login or password", http.StatusUnauthorized)
@@ -36,7 +32,7 @@ func (h *Handler) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, _ := auth.BuildJWTString()
+	token, _ := auth.BuildJWTString(user.Username)
 	cookie := &http.Cookie{
 		Name:     "token",
 		Value:    token,

@@ -50,7 +50,7 @@ func (h *Handler) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, _ := auth.BuildJWTString()
+	token, _ := auth.BuildJWTString(user.Username)
 	cookie := &http.Cookie{
 		Name:     "token",
 		Value:    token,

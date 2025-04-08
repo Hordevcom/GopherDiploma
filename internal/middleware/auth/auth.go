@@ -10,19 +10,19 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID int
+	Username string
 }
 
 var tokenExp = time.Hour * 12
 
 var secretKey = "supersecretkey"
 
-func BuildJWTString() (string, error) {
+func BuildJWTString(user string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenExp)),
 		},
-		UserID: 2,
+		Username: user,
 	})
 
 	tokenString, err := token.SignedString([]byte(secretKey))
@@ -34,7 +34,7 @@ func BuildJWTString() (string, error) {
 	return tokenString, nil
 }
 
-func GetUserID(tokenString string) int {
+func GetUsername(tokenString string) string {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims,
 		func(t *jwt.Token) (interface{}, error) {
@@ -44,14 +44,14 @@ func GetUserID(tokenString string) int {
 			return []byte(secretKey), nil
 		})
 	if err != nil {
-		return -1
+		return ""
 	}
 
 	if !token.Valid {
-		return -1
+		return ""
 	}
 
-	return claims.UserID
+	return claims.Username
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
@@ -59,14 +59,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		_, err := r.Cookie("token")
 
 		if err != nil {
-			token, _ := BuildJWTString()
-			cookie := &http.Cookie{
-				Name:     "token",
-				Value:    token,
-				HttpOnly: true,
-			}
-			http.SetCookie(w, cookie)
-			r.AddCookie(cookie)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		}
 		next.ServeHTTP(w, r)
 	})
