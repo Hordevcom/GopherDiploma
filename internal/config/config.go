@@ -38,6 +38,5 @@ func NewConfig() Config {
 
 	flag.Parse()
 
-	fmt.Printf("flag: %v", conf.DatabaseDsn)
 	return conf
 }
