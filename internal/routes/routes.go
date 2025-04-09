@@ -15,10 +15,10 @@ func NewRouter(logger logging.Logger, handler handlers.Handler) *chi.Mux {
 	router.Post("/api/user/register", handler.UserRegister)
 	router.Post("/api/user/login", handler.UserLogin)
 	router.With(auth.AuthMiddleware).Post("/api/user/orders", handler.OrderLoad)
-	router.Get("api/user/orders", handler.OrderGet)
-	router.Get("/api/user/balance", handler.Balance)
-	router.Post("/api/user/balance/withdraw", handler.BalanceWithdraw)
-	router.Get("/api/user/withdrawals", handler.Withdraw)
+	router.With(auth.AuthMiddleware).Get("api/user/orders", handler.OrderGet)
+	router.With(auth.AuthMiddleware).Get("/api/user/balance", handler.Balance)
+	router.With(auth.AuthMiddleware).Post("/api/user/balance/withdraw", handler.BalanceWithdraw)
+	router.With(auth.AuthMiddleware).Get("/api/user/withdrawals", handler.Withdraw)
 
 	return router
 }
