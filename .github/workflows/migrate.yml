@@ -34,5 +34,5 @@ jobs:
 
       - name: Run migrations
         env:
-          DATABASE_URL: postgresql://postgres:postgres@postgres/praktikum?sslmode=disable
+          DATABASE_URI: postgresql://postgres:postgres@postgres/praktikum?sslmode=disable
         run: go run ./internal/storage/migrations/migrations.go
