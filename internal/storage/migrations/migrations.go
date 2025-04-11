@@ -24,7 +24,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := goose.Up(db, "migrations"); err != nil {
+	if err := goose.Up(db, "internal/storage/migrations"); err != nil {
 		logger.Logger.Fatalw("failed to apply migrations", err)
 	}
 
