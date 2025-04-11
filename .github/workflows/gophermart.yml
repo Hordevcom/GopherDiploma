@@ -53,7 +53,7 @@ jobs:
       - name: Run migrations
         run: go run ./internal/storage/migrations/migrations.go
         env:
-          DATABASE_URI: postgresql://postgres:postgres@localhost:5432/praktikum?sslmode=disable
+          DATABASE_URI: postgresql://postgres:postgres@postgres/praktikum?sslmode=disable
 
       - name: Test
         run: |
