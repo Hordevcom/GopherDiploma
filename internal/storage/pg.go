@@ -33,7 +33,7 @@ func (p *PGDB) GetUserOrders(ctx context.Context, user string) ([]models.Order, 
 		var o models.Order
 		var accrual sql.NullInt64
 
-		err := rows.Scan(&o.Number, &o.Status, &accrual, &o.Upload_at)
+		err := rows.Scan(&o.Number, &o.Status, &accrual, &o.UploadAt)
 		if err != nil {
 			return nil, err
 		}
@@ -102,8 +102,6 @@ func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("New user in base: %v", insertedUser)
 
 	return nil
 }
