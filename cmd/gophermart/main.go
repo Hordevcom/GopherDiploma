@@ -23,8 +23,6 @@ func main() {
 		Handler: router,
 	}
 
-	// storage.InitMigrations(logger.Logger, conf)
-
 	logger.Logger.Infow("Start server", "addr: ", server.Addr)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		logger.Logger.Fatalw("create server err: ", err)

@@ -4,21 +4,50 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/config"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
+	"github.com/Hordevcom/GopherDiploma/internal/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/pressly/goose"
-	"go.uber.org/zap"
 )
 
 type PGDB struct {
 	logger logging.Logger
 	DB     *pgxpool.Pool
+}
+
+func (p *PGDB) GetUserOrders(ctx context.Context, user string) ([]models.Order, error) {
+	query := `SELECT number, status, accrual, uploaded_at 
+		FROM orders WHERE username = $1`
+	rows, err := p.DB.Query(ctx, query, user)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []models.Order
+	for rows.Next() {
+		var o models.Order
+		var accrual sql.NullInt64
+
+		err := rows.Scan(&o.Number, &o.Status, &accrual, &o.Upload_at)
+		if err != nil {
+			return nil, err
+		}
+
+		if accrual.Valid {
+			val := int(accrual.Int64)
+			o.Accrual = val
+		} else {
+			o.Accrual = 0
+		}
+		orders = append(orders, o)
+	}
+
+	return orders, nil
 }
 
 func (p *PGDB) GetOrderAndUser(ctx context.Context, order string) (string, string, error) {
@@ -95,23 +124,4 @@ func NewPGDB(conf config.Config, logger logging.Logger) *PGDB {
 	}
 
 	return &PGDB{logger: logger, DB: db}
-}
-
-func InitMigrations(logger zap.SugaredLogger, conf config.Config) {
-	logger.Infow("Start migrations")
-	db, err := sql.Open("pgx", conf.DatabaseDsn)
-
-	if err != nil {
-		logger.Fatalw("Error with connection to DB: ", err)
-	}
-
-	defer db.Close()
-
-	_, filename, _, _ := runtime.Caller(0)
-	migrationsPath := filepath.Join(filepath.Dir(filename), "migrations")
-
-	err = goose.Up(db, migrationsPath)
-	if err != nil {
-		logger.Fatalw("Error with migrations: ", err)
-	}
 }
