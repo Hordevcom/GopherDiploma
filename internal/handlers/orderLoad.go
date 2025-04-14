@@ -47,7 +47,7 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go pollOrderStatus(r.Context(), string(body), h.Conf.AccurualSystemAddress, h.DB)
+	pollOrderStatus(r.Context(), string(body), h.Conf.AccurualSystemAddress, h.DB)
 
 	w.WriteHeader(http.StatusAccepted)
 }

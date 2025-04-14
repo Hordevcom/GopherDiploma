@@ -29,7 +29,7 @@ func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order stri
 	}
 
 	if result.RowsAffected() == 0 {
-		return fmt.Errorf("0 rows affected!")
+		return fmt.Errorf("0 rows affected")
 	}
 
 	return nil
