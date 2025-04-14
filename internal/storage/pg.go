@@ -23,7 +23,7 @@ func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order stri
 	query := `UPDATE orders SET status = $1, accrual = $2
 			WHERE number = $3`
 
-	result, err := p.DB.Exec(ctx, query, newStatus, accrual, order)
+	result, err := p.DB.Exec(ctx, query, newStatus, int(accrual*100), order)
 
 	if err != nil {
 		return err
