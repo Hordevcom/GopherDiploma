@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/auth"
 )
@@ -43,5 +44,34 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
+
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func pollOrderStatus(orderNum string, accrual string) {
+	url := fmt.Sprintf("http://%s/api/orders/%s", accrual, orderNum)
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			resp, err := http.Get(url)
+			if err != nil {
+				fmt.Println("poll error:", err)
+				continue
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				fmt.Println("read response error:", err)
+				continue
+			}
+
+			fmt.Printf("Order %s — статус: %s, тело: %s\n", orderNum, resp.Status, string(body))
+
+		}
+	}
 }

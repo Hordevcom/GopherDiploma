@@ -25,8 +25,6 @@ func (h *Handler) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(user)
-
 	// check login in DB if already exist
 	if exist := h.DB.CheckUsernameLogin(r.Context(), user.Username); exist {
 		w.WriteHeader(http.StatusConflict)
