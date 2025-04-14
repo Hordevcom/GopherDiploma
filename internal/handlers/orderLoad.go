@@ -44,7 +44,7 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
+	go pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
 
 	w.WriteHeader(http.StatusAccepted)
 }
@@ -54,9 +54,18 @@ func pollOrderStatus(orderNum string, accrual string) {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
+	timeout := time.After(2 * time.Minute)
+	attempts := 0
+	maxAttempts := 12
+
 	for {
 		select {
 		case <-ticker.C:
+			attempts++
+			if attempts > maxAttempts {
+				fmt.Println("Превышено количество попыток")
+				return
+			}
 			resp, err := http.Get(url)
 			if err != nil {
 				fmt.Println("poll error:", err)
@@ -71,7 +80,9 @@ func pollOrderStatus(orderNum string, accrual string) {
 			}
 
 			fmt.Printf("Order %s — статус: %s, тело: %s\n", orderNum, resp.Status, string(body))
-
+		case <-timeout:
+			fmt.Println("Time is out")
+			return
 		}
 	}
 }
