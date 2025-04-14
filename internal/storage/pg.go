@@ -19,6 +19,7 @@ type PGDB struct {
 }
 
 func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order string, accrual float64) error {
+	fmt.Println("Accrual: ", accrual)
 	query := `UPDATE orders SET status = $1, accrual = $2
 			WHERE number = $3`
 
