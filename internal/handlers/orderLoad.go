@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/auth"
+	"github.com/Hordevcom/GopherDiploma/internal/storage"
 )
 
 func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +47,7 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
+	go pollOrderStatus(r.Context(), string(body), h.Conf.AccurualSystemAddress, h.DB)
 
 	w.WriteHeader(http.StatusAccepted)
 }
@@ -56,7 +58,7 @@ type OrderResponce struct {
 	Accrual float64 `json:"accrual"`
 }
 
-func pollOrderStatus(orderNum string, accrual string) {
+func pollOrderStatus(ctx context.Context, orderNum string, accrual string, db storage.PGDB) {
 	url := fmt.Sprintf("%s/api/orders/%s", accrual, orderNum)
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
@@ -98,6 +100,12 @@ func pollOrderStatus(orderNum string, accrual string) {
 
 			if responce.Status == "PROCESSED" {
 				fmt.Println("Начислено!!!")
+				err := db.UpdateStatusAndAccural(ctx, responce.Status, responce.Order, responce.Accrual)
+
+				if err != nil {
+					fmt.Println("Error in update db: ", err)
+					return
+				}
 				return
 			} else {
 				fmt.Println(responce.Status, " not equal PROCESSED!")

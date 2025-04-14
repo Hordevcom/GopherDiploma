@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/config"
@@ -15,6 +16,23 @@ import (
 type PGDB struct {
 	logger logging.Logger
 	DB     *pgxpool.Pool
+}
+
+func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order string, accrual float64) error {
+	query := `UPDATE orders SET status = $1, accrual = $2
+			WHERE number = $3`
+
+	result, err := p.DB.Exec(ctx, query, newStatus, accrual, order)
+
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("0 rows affected!")
+	}
+
+	return nil
 }
 
 func (p *PGDB) GetUserOrders(ctx context.Context, user string) ([]models.Order, error) {
