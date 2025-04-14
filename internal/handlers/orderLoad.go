@@ -96,11 +96,11 @@ func pollOrderStatus(orderNum string, accrual string) {
 
 			fmt.Println("responce: ", responce)
 
-			if resp.Status == "PROCESSED" {
+			if responce.Status == "PROCESSED" {
 				fmt.Println("Начислено!!!")
 				return
 			} else {
-				fmt.Println(resp.Status, " not equal PROCESSED!")
+				fmt.Println(responce.Status, " not equal PROCESSED!")
 			}
 		case <-timeout:
 			fmt.Println("Time is out")
