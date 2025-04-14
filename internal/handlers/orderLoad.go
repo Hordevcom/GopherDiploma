@@ -44,13 +44,13 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
+	pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
 
 	w.WriteHeader(http.StatusAccepted)
 }
 
 func pollOrderStatus(orderNum string, accrual string) {
-	url := fmt.Sprintf("http://%s/api/orders/%s", accrual, orderNum)
+	url := fmt.Sprintf("%s/api/orders/%s", accrual, orderNum)
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
