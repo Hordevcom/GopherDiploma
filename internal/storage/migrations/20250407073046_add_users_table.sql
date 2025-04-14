@@ -19,7 +19,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS orders (
     number TEXT NOT NULL PRIMARY KEY,
     status order_status NOT NULL DEFAULT 'NEW',
-    accrual DOUBLE PRECISION,
+    accrual FLOAT,
     uploaded_at TIMESTAMPTZ NOT NULL,
     username TEXT REFERENCES users(username) ON DELETE SET NULL
 );
