@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/config"
@@ -91,7 +90,6 @@ func (p *PGDB) CheckUsernameLogin(ctx context.Context, username string) bool {
 }
 
 func (p *PGDB) AddUserToDB(ctx context.Context, username, password string) error {
-	fmt.Printf("user: %v, password: %v", username, password)
 	var insertedUser string
 	query := `INSERT INTO users (username, user_password)
 				VALUES ($1, $2) ON CONFLICT (username) DO NOTHING

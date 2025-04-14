@@ -94,6 +94,8 @@ func pollOrderStatus(orderNum string, accrual string) {
 				return
 			}
 
+			fmt.Println("responce: ", responce)
+
 			if resp.Status == "PROCESSED" {
 				fmt.Println("Начислено!!!")
 				return
