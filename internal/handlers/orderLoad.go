@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -44,9 +45,15 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
+	go pollOrderStatus(string(body), h.Conf.AccurualSystemAddress)
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+type OrderResponce struct {
+	Order   string  `json:"order"`
+	Status  string  `json:"status"`
+	Accrual float64 `json:"accrual"`
 }
 
 func pollOrderStatus(orderNum string, accrual string) {
@@ -79,7 +86,18 @@ func pollOrderStatus(orderNum string, accrual string) {
 				continue
 			}
 
+			var responce OrderResponce
 			fmt.Printf("Order %s — статус: %s, тело: %s\n", orderNum, resp.Status, string(body))
+			err = json.Unmarshal(body, &responce)
+			if err != nil {
+				fmt.Println("Ошибка парсинга:", err)
+				return
+			}
+
+			if resp.Status == "PROCESSED" {
+				fmt.Println("Начислено!!!")
+				return
+			}
 		case <-timeout:
 			fmt.Println("Time is out")
 			return
