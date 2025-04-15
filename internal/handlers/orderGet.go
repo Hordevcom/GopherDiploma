@@ -27,8 +27,6 @@ func (h *Handler) OrderGet(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Println("OrderResp: ", orderResp)
-
 	err = json.NewEncoder(w).Encode(orderResp)
 	if err != nil {
 		http.Error(w, "Problem with encode data", http.StatusInternalServerError)

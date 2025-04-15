@@ -15,3 +15,8 @@ type OrderFloat struct {
 	Accrual  float64   `json:"accrual,omitempty"`
 	UploadAt time.Time `json:"upload_at"`
 }
+
+type UserBalance struct {
+	Current   float32 `json:"current"`
+	Withdrawn float32 `json:"withdrawn"`
+}

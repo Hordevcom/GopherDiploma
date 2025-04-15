@@ -18,8 +18,21 @@ type PGDB struct {
 	DB     *pgxpool.Pool
 }
 
+func (p *PGDB) GetUserBalance(ctx context.Context, user string) (models.UserBalance, error) {
+	var balance models.UserBalance
+	query := `SELECT accrual, withdrawn 
+		FROM orders WHERE username = $1`
+	row := p.DB.QueryRow(ctx, query, user)
+	err := row.Scan(&balance.Current, &balance.Withdrawn)
+
+	if err != nil {
+		return models.UserBalance{}, err
+	}
+
+	return balance, nil
+}
+
 func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order string, accrual float64) error {
-	fmt.Println("Accrual: ", accrual)
 	query := `UPDATE orders SET status = $1, accrual = $2
 			WHERE number = $3`
 
