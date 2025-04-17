@@ -18,10 +18,30 @@ type PGDB struct {
 	DB     *pgxpool.Pool
 }
 
+func (p *PGDB) SetUserWithdrawn(ctx context.Context, orderNum string, newBalance, withdrawn float32) {
+}
+
+func (p *PGDB) UpdateUserBalance(ctx context.Context, user string, accrual, withdrawn float32) error {
+	query := `UPDATE users SET accrual = $1, withdrawn = $2
+			WHERE username = $3`
+
+	result, err := p.DB.Exec(ctx, query, int(accrual*100), int(withdrawn*100), user)
+
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("0 rows affected")
+	}
+
+	return nil
+}
+
 func (p *PGDB) GetUserBalance(ctx context.Context, user string) (models.UserBalance, error) {
 	var balance models.UserBalance
 	query := `SELECT accrual, withdrawn 
-		FROM orders WHERE username = $1`
+		FROM users WHERE username = $1`
 	row := p.DB.QueryRow(ctx, query, user)
 	err := row.Scan(&balance.Current, &balance.Withdrawn)
 
@@ -34,11 +54,11 @@ func (p *PGDB) GetUserBalance(ctx context.Context, user string) (models.UserBala
 	return balance, nil
 }
 
-func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order string, accrual float64) error {
-	query := `UPDATE orders SET status = $1, accrual = $2
-			WHERE number = $3`
+func (p *PGDB) UpdateStatus(ctx context.Context, newStatus, order, user string) error {
+	query := `UPDATE orders SET status = $1
+			WHERE number = $2`
 
-	result, err := p.DB.Exec(ctx, query, newStatus, int(accrual*100), order)
+	result, err := p.DB.Exec(ctx, query, newStatus, order)
 
 	if err != nil {
 		return err
@@ -47,6 +67,19 @@ func (p *PGDB) UpdateStatusAndAccural(ctx context.Context, newStatus, order stri
 	if result.RowsAffected() == 0 {
 		return fmt.Errorf("0 rows affected")
 	}
+
+	// query = `UPDATE users SET accrual = $1
+	// 		WHERE username = $2`
+
+	// result, err = p.DB.Exec(ctx, query, int(accrual*100), user)
+
+	// if err != nil {
+	// 	return err
+	// }
+
+	// if result.RowsAffected() == 0 {
+	// 	return fmt.Errorf("0 rows affected")
+	// }
 
 	return nil
 }

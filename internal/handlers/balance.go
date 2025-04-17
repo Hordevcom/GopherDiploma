@@ -13,8 +13,6 @@ func (h *Handler) Balance(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("token")
 	user := auth.GetUsername(cookie.Value)
 
-	fmt.Println(user)
-
 	result, err := service.GetBalance(r.Context(), user, h.DB)
 
 	if err != nil {
@@ -27,5 +25,4 @@ func (h *Handler) Balance(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Problem with encode data", http.StatusInternalServerError)
 	}
-	//w.WriteHeader(http.StatusOK)
 }

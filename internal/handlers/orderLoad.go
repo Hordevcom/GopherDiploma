@@ -47,7 +47,7 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pollOrderStatus(r.Context(), string(body), h.Conf.AccurualSystemAddress, h.DB)
+	go pollOrderStatus(r.Context(), string(body), user, h.Conf.AccurualSystemAddress, h.DB)
 
 	w.WriteHeader(http.StatusAccepted)
 }
@@ -58,7 +58,7 @@ type OrderResponce struct {
 	Accrual float64 `json:"accrual"`
 }
 
-func pollOrderStatus(ctx context.Context, orderNum string, accrual string, db storage.PGDB) {
+func pollOrderStatus(ctx context.Context, orderNum, user string, accrual string, db storage.PGDB) {
 	url := fmt.Sprintf("%s/api/orders/%s", accrual, orderNum)
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
@@ -89,18 +89,21 @@ func pollOrderStatus(ctx context.Context, orderNum string, accrual string, db st
 			}
 
 			var responce OrderResponce
-			fmt.Printf("Order %s — статус: %s, тело: %s\n", orderNum, resp.Status, string(body))
 			err = json.Unmarshal(body, &responce)
 			if err != nil {
 				fmt.Println("Ошибка парсинга:", err)
 				return
 			}
 
-			fmt.Println("responce: ", responce)
-
 			if responce.Status == "PROCESSED" {
-				fmt.Println("Начислено!!!")
-				err := db.UpdateStatusAndAccural(ctx, responce.Status, responce.Order, responce.Accrual)
+				err := db.UpdateStatus(ctx, responce.Status, responce.Order, user)
+
+				if err != nil {
+					fmt.Println("Error in update db: ", err)
+					return
+				}
+
+				err = db.UpdateUserBalance(ctx, user, float32(responce.Accrual), 0)
 
 				if err != nil {
 					fmt.Println("Error in update db: ", err)

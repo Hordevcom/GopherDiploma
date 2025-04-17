@@ -20,3 +20,9 @@ type UserBalance struct {
 	Current   float32 `json:"current"`
 	Withdrawn float32 `json:"withdrawn"`
 }
+
+type UserWithdrawal struct {
+	OrderNum    string    `json:"order"`
+	Sum         float32   `json:"sum"`
+	ProcessedAt time.Time `json:"processed_at"`
+}
