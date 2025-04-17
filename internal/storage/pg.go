@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -85,7 +84,7 @@ func (p *PGDB) UpdateStatus(ctx context.Context, newStatus, order, user string) 
 }
 
 func (p *PGDB) GetUserOrders(ctx context.Context, user string) ([]models.Order, error) {
-	query := `SELECT number, status, accrual, uploaded_at 
+	query := `SELECT number, status, uploaded_at 
 		FROM orders WHERE username = $1`
 	rows, err := p.DB.Query(ctx, query, user)
 
@@ -97,19 +96,19 @@ func (p *PGDB) GetUserOrders(ctx context.Context, user string) ([]models.Order, 
 	var orders []models.Order
 	for rows.Next() {
 		var o models.Order
-		var accrual sql.NullInt64
+		// var accrual sql.NullInt64
 
-		err := rows.Scan(&o.Number, &o.Status, &accrual, &o.UploadAt)
+		err := rows.Scan(&o.Number, &o.Status, &o.UploadAt)
 		if err != nil {
 			return nil, err
 		}
 
-		if accrual.Valid {
-			val := int(accrual.Int64)
-			o.Accrual = val
-		} else {
-			o.Accrual = 0
-		}
+		// if accrual.Valid {
+		// 	val := int(accrual.Int64)
+		// 	o.Accrual = val
+		// } else {
+		// 	o.Accrual = 0
+		// }
 		orders = append(orders, o)
 	}
 

@@ -18,7 +18,7 @@ func GetOrders(ctx context.Context, user string, db storage.PGDB) ([]models.Orde
 	userBalance, err := db.GetUserBalance(ctx, user)
 
 	if err != nil {
-		fmt.Println("Error!!!: ", err)
+		fmt.Println("Error!: ", err)
 		return nil, err
 	}
 	var ordersFloat []models.OrderFloat
