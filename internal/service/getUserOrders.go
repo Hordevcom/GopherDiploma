@@ -27,7 +27,7 @@ func GetOrders(ctx context.Context, user string, db storage.PGDB) ([]models.Orde
 		ordersFloat = append(ordersFloat, models.OrderFloat{
 			Number:   order.Number,
 			Status:   order.Status,
-			Accrual:  float64(userBalance.Current) / 100,
+			Accrual:  float64(userBalance.Current / 100),
 			UploadAt: order.UploadAt,
 		})
 	}
