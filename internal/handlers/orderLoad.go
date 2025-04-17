@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/auth"
+	"github.com/Hordevcom/GopherDiploma/internal/service"
 	"github.com/Hordevcom/GopherDiploma/internal/storage"
 )
 
@@ -21,6 +22,11 @@ func (h *Handler) OrderLoad(w http.ResponseWriter, r *http.Request) {
 
 	if len(body) == 0 {
 		http.Error(w, "url param required", http.StatusBadRequest)
+		return
+	}
+
+	if !service.LuhnCheck(string(body)) {
+		http.Error(w, "Failed Luhn algo", http.StatusUnprocessableEntity)
 		return
 	}
 
