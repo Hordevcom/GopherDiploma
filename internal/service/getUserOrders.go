@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Hordevcom/GopherDiploma/internal/models"
 	"github.com/Hordevcom/GopherDiploma/internal/storage"
@@ -9,8 +10,17 @@ import (
 
 func GetOrders(ctx context.Context, user string, db storage.PGDB) ([]models.OrderFloat, error) {
 	orders, err := db.GetUserOrders(ctx, user)
+
+	if err != nil {
+		fmt.Println("Error!!!: ", err)
+		return nil, err
+	}
 	userBalance, err := db.GetUserBalance(ctx, user)
-	// get user balance. Write new func in pg.go
+
+	if err != nil {
+		fmt.Println("Error!!!: ", err)
+		return nil, err
+	}
 	var ordersFloat []models.OrderFloat
 
 	for _, order := range orders {

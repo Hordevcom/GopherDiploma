@@ -21,14 +21,14 @@ END $$;
 CREATE TABLE IF NOT EXISTS orders (
     number TEXT NOT NULL PRIMARY KEY,
     status order_status NOT NULL DEFAULT 'NEW',
-    accrual INT DEFAULT 0, -- DELETE
-    withdrawn INT DEFAULT 0, -- DELETE
+    --accrual INT DEFAULT 0, -- DELETE
+    --withdrawn INT DEFAULT 0, -- DELETE
     uploaded_at TIMESTAMPTZ NOT NULL,
     username TEXT REFERENCES users(username) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS withdrawals (
-    order TEXT NOT NULL PRIMARY KEY,
+    orderNum TEXT NOT NULL PRIMARY KEY,
     sum INT DEFAULT 0,
     precessed_at TIMESTAMPTZ NOT NULL,
     username TEXT REFERENCES users(username) ON DELETE SET NULL
