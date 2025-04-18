@@ -17,7 +17,38 @@ type PGDB struct {
 	DB     *pgxpool.Pool
 }
 
-func (p *PGDB) SetUserWithdrawn(ctx context.Context, orderNum string, newBalance, withdrawn float32) {
+func (p *PGDB) GetUserWithdrawns(ctx context.Context, user string) ([]models.UserWithdrawal, error) {
+	query := `SELECT orderNum, sum, precessed_at 
+	FROM orders WHERE username = $1`
+	rows, err := p.DB.Query(ctx, query, user)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var UserWithdrawals []models.UserWithdrawal
+	for rows.Next() {
+		var o models.UserWithdrawal
+
+		err := rows.Scan(&o.OrderNum, &o.Sum, &o.ProcessedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		UserWithdrawals = append(UserWithdrawals, o)
+	}
+
+	return UserWithdrawals, nil
+}
+
+func (p *PGDB) SetUserWithdrawn(ctx context.Context, orderNum, user string, withdrawn float32) error {
+	query := `INSERT INTO orders (orderNum, sum, precessed_at, username)
+				VALUES ($1, $2, $3, $4) ON CONFLICT (orderNum) DO NOTHING`
+
+	_, err := p.DB.Exec(ctx, query, orderNum, withdrawn, time.Now(), user)
+
+	return err
 }
 
 func (p *PGDB) UpdateUserBalance(ctx context.Context, user string, accrual, withdrawn float32) error {
