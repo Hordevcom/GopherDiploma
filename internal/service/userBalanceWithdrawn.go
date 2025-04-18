@@ -9,7 +9,7 @@ import (
 )
 
 func BalanceWithdrawn(ctx context.Context, currentBalance float32, withdrawn models.UserWithdrawal, db storage.PGDB, user string) error {
-	fmt.Println("currentBalance is: ", withdrawn.Sum)
+	fmt.Println("currentBalance is: ", currentBalance)
 	fmt.Println("Sum is: ", withdrawn.Sum)
 	finalSum := currentBalance - withdrawn.Sum
 	fmt.Println("finalSum is: ", finalSum)

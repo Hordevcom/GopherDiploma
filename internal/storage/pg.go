@@ -36,7 +36,11 @@ func (p *PGDB) GetUserWithdrawns(ctx context.Context, user string) ([]models.Use
 			return nil, err
 		}
 
-		UserWithdrawals = append(UserWithdrawals, o)
+		UserWithdrawals = append(UserWithdrawals, models.UserWithdrawal{
+			Sum:         o.Sum / 100,
+			OrderNum:    o.OrderNum,
+			ProcessedAt: o.ProcessedAt,
+		})
 	}
 
 	return UserWithdrawals, nil
@@ -46,7 +50,7 @@ func (p *PGDB) SetUserWithdrawn(ctx context.Context, orderNum, user string, with
 	query := `INSERT INTO withdrawals (orderNum, sum, precessed_at, username)
 				VALUES ($1, $2, $3, $4) ON CONFLICT (orderNum) DO NOTHING`
 
-	_, err := p.DB.Exec(ctx, query, orderNum, withdrawn, time.Now(), user)
+	_, err := p.DB.Exec(ctx, query, orderNum, withdrawn*100, time.Now(), user)
 
 	return err
 }
