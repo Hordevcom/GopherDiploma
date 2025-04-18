@@ -24,7 +24,7 @@ func (p *PGDB) UpdateUserBalance(ctx context.Context, user string, accrual, with
 	query := `UPDATE users SET accrual = $1, withdrawn = $2
 			WHERE username = $3`
 
-	result, err := p.DB.Exec(ctx, query, int(accrual*100), int(withdrawn*100), user)
+	result, err := p.DB.Exec(ctx, query, int(accrual*100), int(withdrawn*1000), user)
 
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (p *PGDB) GetUserBalance(ctx context.Context, user string) (models.UserBala
 
 	balance = models.UserBalance{
 		Current:   balance.Current / 100,
-		Withdrawn: balance.Withdrawn / 100,
+		Withdrawn: balance.Withdrawn / 1000,
 	}
 
 	return balance, nil
