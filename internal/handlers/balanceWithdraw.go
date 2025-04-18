@@ -47,7 +47,7 @@ func (h *Handler) BalanceWithdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = service.BalanceWithdrawn(userBalance.Current, data)
+	err = service.BalanceWithdrawn(r.Context(), userBalance.Current, data, h.DB, user)
 
 	if err != nil {
 		fmt.Println("error: ", err)
