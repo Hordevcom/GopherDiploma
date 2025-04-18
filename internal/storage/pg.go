@@ -50,7 +50,7 @@ func (p *PGDB) GetUserBalance(ctx context.Context, user string) (models.UserBala
 
 	balance = models.UserBalance{
 		Current:   balance.Current / 100,
-		Withdrawn: balance.Withdrawn,
+		Withdrawn: balance.Withdrawn / 100,
 	}
 
 	return balance, nil
