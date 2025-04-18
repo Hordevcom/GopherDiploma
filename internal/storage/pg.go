@@ -19,7 +19,7 @@ type PGDB struct {
 
 func (p *PGDB) GetUserWithdrawns(ctx context.Context, user string) ([]models.UserWithdrawal, error) {
 	query := `SELECT orderNum, sum, precessed_at 
-	FROM orders WHERE username = $1`
+	FROM withdrawals WHERE username = $1`
 	rows, err := p.DB.Query(ctx, query, user)
 
 	if err != nil {
