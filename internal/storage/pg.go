@@ -48,7 +48,10 @@ func (p *PGDB) GetUserBalance(ctx context.Context, user string) (models.UserBala
 		return models.UserBalance{}, err
 	}
 
-	balance.Current = balance.Current / 100
+	balance = models.UserBalance{
+		Current:   balance.Current / 100,
+		Withdrawn: balance.Withdrawn,
+	}
 
 	return balance, nil
 }
@@ -67,19 +70,6 @@ func (p *PGDB) UpdateStatus(ctx context.Context, newStatus, order, user string) 
 		return fmt.Errorf("0 rows affected")
 	}
 
-	// query = `UPDATE users SET accrual = $1
-	// 		WHERE username = $2`
-
-	// result, err = p.DB.Exec(ctx, query, int(accrual*100), user)
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if result.RowsAffected() == 0 {
-	// 	return fmt.Errorf("0 rows affected")
-	// }
-
 	return nil
 }
 
@@ -96,19 +86,12 @@ func (p *PGDB) GetUserOrders(ctx context.Context, user string) ([]models.Order, 
 	var orders []models.Order
 	for rows.Next() {
 		var o models.Order
-		// var accrual sql.NullInt64
 
 		err := rows.Scan(&o.Number, &o.Status, &o.UploadAt)
 		if err != nil {
 			return nil, err
 		}
 
-		// if accrual.Valid {
-		// 	val := int(accrual.Int64)
-		// 	o.Accrual = val
-		// } else {
-		// 	o.Accrual = 0
-		// }
 		orders = append(orders, o)
 	}
 
