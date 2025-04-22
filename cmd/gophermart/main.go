@@ -7,6 +7,7 @@ import (
 	"github.com/Hordevcom/GopherDiploma/internal/handlers"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
 	"github.com/Hordevcom/GopherDiploma/internal/routes"
+	"github.com/Hordevcom/GopherDiploma/internal/service"
 	"github.com/Hordevcom/GopherDiploma/internal/storage"
 )
 
@@ -15,8 +16,9 @@ func main() {
 	logger := logging.NewLogger()
 	conf := config.NewConfig()
 	DB := storage.NewPGDB(conf, *logger)
-	handler := handlers.NewHandler(*DB, conf)
-	router := routes.NewRouter(*logger, *handler)
+	handler := handlers.NewHandler(*DB, conf, logger.Logger)
+	services := service.NewService(DB)
+	router := routes.NewRouter(*logger, *handler, DB, conf, *services)
 
 	server := &http.Server{
 		Addr:    conf.ServerAdress,

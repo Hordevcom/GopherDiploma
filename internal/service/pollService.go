@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/Hordevcom/GopherDiploma/internal/storage"
 )
 
 type OrderResponce struct {
@@ -17,7 +15,7 @@ type OrderResponce struct {
 	Accrual float64 `json:"accrual"`
 }
 
-func PollOrderStatus(ctx context.Context, orderNum, user string, accrual string, db storage.PGDB) {
+func (s Service) PollOrderStatus(ctx context.Context, orderNum, user string, accrual string) {
 	url := fmt.Sprintf("%s/api/orders/%s", accrual, orderNum)
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
@@ -55,14 +53,14 @@ func PollOrderStatus(ctx context.Context, orderNum, user string, accrual string,
 			}
 
 			if responce.Status == "PROCESSED" {
-				err := db.UpdateStatus(ctx, responce.Status, responce.Order, user)
+				err := s.Updater.UpdateStatus(ctx, responce.Status, responce.Order, user)
 
 				if err != nil {
 					fmt.Println("Error in update db: ", err)
 					return
 				}
 
-				err = db.UpdateUserBalance(ctx, user, float32(responce.Accrual), 0)
+				err = s.Updater.UpdateUserBalance(ctx, user, float32(responce.Accrual), 0)
 
 				if err != nil {
 					fmt.Println("Error in update db: ", err)
