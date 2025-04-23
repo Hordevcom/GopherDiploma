@@ -17,7 +17,7 @@ func main() {
 	conf := config.NewConfig()
 	DB := storage.NewPGDB(conf, *logger)
 	handler := handlers.NewHandler(*DB, conf, logger.Logger)
-	services := service.NewService(DB)
+	services := service.NewService(*DB)
 	router := routes.NewRouter(*logger, *handler, DB, conf, *services)
 
 	server := &http.Server{

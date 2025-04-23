@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,12 +26,7 @@ func NewHandler(DB storage.PGDB, Conf config.Config, logger zap.SugaredLogger) *
 	}
 }
 
-type OrderGetter interface {
-	GetOrderAndUser(ctx context.Context, orderID string) (order, username string, err error)
-	AddOrderToDB(ctx context.Context, orderID, username string) error
-}
-
-func NewOrderLoad(db OrderGetter, accrualAddress string, serv service.Service) http.HandlerFunc {
+func NewOrderLoad(accrualAddress string, serv service.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -52,7 +46,8 @@ func NewOrderLoad(db OrderGetter, accrualAddress string, serv service.Service) h
 
 		cookie, _ := r.Cookie("token")
 		user := auth.GetUsername(cookie.Value)
-		order, username, err := db.GetOrderAndUser(r.Context(), string(body))
+
+		order, username, err := serv.GetOrderAndUser(r.Context(), string(body))
 
 		if err == nil && order == string(body) {
 
@@ -65,7 +60,7 @@ func NewOrderLoad(db OrderGetter, accrualAddress string, serv service.Service) h
 			}
 		}
 
-		err = db.AddOrderToDB(r.Context(), string(body), user)
+		err = serv.AddOrderToDB(r.Context(), string(body), user)
 
 		if err != nil {
 			fmt.Println(err)
@@ -73,7 +68,7 @@ func NewOrderLoad(db OrderGetter, accrualAddress string, serv service.Service) h
 			return
 		}
 
-		serv.PollOrderStatus(r.Context(), string(body), user, accrualAddress)
+		go serv.PollOrderStatus(r.Context(), string(body), user, accrualAddress)
 
 		w.WriteHeader(http.StatusAccepted)
 	}

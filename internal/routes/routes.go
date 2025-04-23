@@ -19,7 +19,7 @@ func NewRouter(logger logging.Logger, handler handlers.Handler, db *storage.PGDB
 	router.Post("/api/user/register", handler.UserRegister)
 	router.Post("/api/user/login", handler.UserLogin)
 	//router.With(auth.AuthMiddleware).Post("/api/user/orders", handler.OrderLoad)
-	router.With(auth.AuthMiddleware).Post("/api/user/orders", handlers.NewOrderLoad(db, conf.AccurualSystemAddress, serv))
+	router.With(auth.AuthMiddleware).Post("/api/user/orders", handlers.NewOrderLoad(conf.AccurualSystemAddress, serv))
 	router.With(auth.AuthMiddleware).Get("/api/user/orders", handler.OrderGet)
 	router.With(auth.AuthMiddleware).Get("/api/user/balance", handler.Balance)
 	router.With(auth.AuthMiddleware).Post("/api/user/balance/withdraw", handler.BalanceWithdraw)
