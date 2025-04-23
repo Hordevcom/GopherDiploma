@@ -12,13 +12,11 @@ import (
 
 func NewRouter(logger logging.Logger, handler handlers.Handler, db *storage.PGDB, conf config.Config, serv service.Service) *chi.Mux {
 	router := chi.NewRouter()
-	//db handlers.OrderGetter, accrualAddress string, serv service.Service
 
 	router.Use(logger.WithLogging)
 
 	router.Post("/api/user/register", handler.UserRegister)
 	router.Post("/api/user/login", handler.UserLogin)
-	//router.With(auth.AuthMiddleware).Post("/api/user/orders", handler.OrderLoad)
 	router.With(auth.AuthMiddleware).Post("/api/user/orders", handlers.NewOrderLoad(conf.AccurualSystemAddress, serv))
 	router.With(auth.AuthMiddleware).Get("/api/user/orders", handler.OrderGet)
 	router.With(auth.AuthMiddleware).Get("/api/user/balance", handler.Balance)
