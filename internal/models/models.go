@@ -26,3 +26,8 @@ type UserWithdrawal struct {
 	Sum         float32   `json:"sum"`
 	ProcessedAt time.Time `json:"processed_at"`
 }
+
+type User struct {
+	Username string `json:"login"`
+	Password string `json:"password,omitempty"`
+}

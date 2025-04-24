@@ -2,24 +2,20 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Hordevcom/GopherDiploma/internal/models"
-	"github.com/Hordevcom/GopherDiploma/internal/storage"
 )
 
-func BalanceWithdrawn(ctx context.Context, currentBalance float32, withdrawn models.UserWithdrawal, db storage.PGDB, user string) error {
-	fmt.Println("currentBalance is: ", currentBalance)
-	fmt.Println("Sum is: ", withdrawn.Sum)
+func (s Service) BalanceWithdrawn(ctx context.Context, currentBalance float32, withdrawn models.UserWithdrawal, user string) error {
 	finalSum := currentBalance - withdrawn.Sum
-	fmt.Println("finalSum is: ", finalSum)
-	err := db.UpdateUserBalance(ctx, user, finalSum, withdrawn.Sum)
+
+	err := s.BalanceUpdater.UpdateUserBalance(ctx, user, finalSum, withdrawn.Sum)
 
 	if err != nil {
 		return err
 	}
 
-	err = db.SetUserWithdrawn(ctx, withdrawn.OrderNum, user, withdrawn.Sum)
+	err = s.BalanceUpdater.SetUserWithdrawn(ctx, withdrawn.OrderNum, user, withdrawn.Sum)
 
 	if err != nil {
 		return err

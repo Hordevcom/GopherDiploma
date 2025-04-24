@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Hordevcom/GopherDiploma/internal/config"
-	"github.com/Hordevcom/GopherDiploma/internal/handlers"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/logging"
 	"github.com/Hordevcom/GopherDiploma/internal/routes"
 	"github.com/Hordevcom/GopherDiploma/internal/service"
@@ -16,9 +15,8 @@ func main() {
 	logger := logging.NewLogger()
 	conf := config.NewConfig()
 	DB := storage.NewPGDB(conf, *logger)
-	handler := handlers.NewHandler(*DB, conf, logger.Logger)
 	services := service.NewService(*DB)
-	router := routes.NewRouter(*logger, *handler, DB, conf, *services)
+	router := routes.NewRouter(*logger, DB, conf, *services)
 
 	server := &http.Server{
 		Addr:    conf.ServerAdress,

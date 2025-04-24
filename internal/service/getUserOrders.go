@@ -5,17 +5,16 @@ import (
 	"fmt"
 
 	"github.com/Hordevcom/GopherDiploma/internal/models"
-	"github.com/Hordevcom/GopherDiploma/internal/storage"
 )
 
-func GetOrders(ctx context.Context, user string, db storage.PGDB) ([]models.OrderFloat, error) {
-	orders, err := db.GetUserOrders(ctx, user)
+func (s Service) GetOrders(ctx context.Context, user string) ([]models.OrderFloat, error) {
+	orders, err := s.GetOrder.GetUserOrders(ctx, user)
 
 	if err != nil {
 		fmt.Println("Error!!!: ", err)
 		return nil, err
 	}
-	userBalance, err := db.GetUserBalance(ctx, user)
+	userBalance, err := s.GetBalance.GetUserBalance(ctx, user)
 
 	if err != nil {
 		fmt.Println("Error!: ", err)

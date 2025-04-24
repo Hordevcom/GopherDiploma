@@ -10,18 +10,18 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func NewRouter(logger logging.Logger, handler handlers.Handler, db *storage.PGDB, conf config.Config, serv service.Service) *chi.Mux {
+func NewRouter(logger logging.Logger, db *storage.PGDB, conf config.Config, serv service.Service) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(logger.WithLogging)
 
-	router.Post("/api/user/register", handler.UserRegister)
-	router.Post("/api/user/login", handler.UserLogin)
+	router.Post("/api/user/register", handlers.NewUserRegister(serv))
+	router.Post("/api/user/login", handlers.NewUserLogin(serv))
 	router.With(auth.AuthMiddleware).Post("/api/user/orders", handlers.NewOrderLoad(conf.AccurualSystemAddress, serv))
-	router.With(auth.AuthMiddleware).Get("/api/user/orders", handler.OrderGet)
-	router.With(auth.AuthMiddleware).Get("/api/user/balance", handler.Balance)
-	router.With(auth.AuthMiddleware).Post("/api/user/balance/withdraw", handler.BalanceWithdraw)
-	router.With(auth.AuthMiddleware).Get("/api/user/withdrawals", handler.Withdraw)
+	router.With(auth.AuthMiddleware).Get("/api/user/orders", handlers.NewOrderGet(serv))
+	router.With(auth.AuthMiddleware).Get("/api/user/balance", handlers.NewBalance(serv))
+	router.With(auth.AuthMiddleware).Post("/api/user/balance/withdraw", handlers.NewBalanceWithdrawn(serv))
+	router.With(auth.AuthMiddleware).Get("/api/user/withdrawals", handlers.NewWithdraw(serv))
 
 	return router
 }

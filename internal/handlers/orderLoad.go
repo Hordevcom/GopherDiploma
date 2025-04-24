@@ -5,26 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Hordevcom/GopherDiploma/internal/config"
 	"github.com/Hordevcom/GopherDiploma/internal/middleware/auth"
 	"github.com/Hordevcom/GopherDiploma/internal/service"
-	"github.com/Hordevcom/GopherDiploma/internal/storage"
-	"go.uber.org/zap"
 )
-
-type Handler struct {
-	DB     storage.PGDB
-	Conf   config.Config
-	logger zap.SugaredLogger
-}
-
-func NewHandler(DB storage.PGDB, Conf config.Config, logger zap.SugaredLogger) *Handler {
-	return &Handler{
-		DB:     DB,
-		Conf:   Conf,
-		logger: logger,
-	}
-}
 
 func NewOrderLoad(accrualAddress string, serv service.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +51,7 @@ func NewOrderLoad(accrualAddress string, serv service.Service) http.HandlerFunc 
 			return
 		}
 
-		go serv.PollOrderStatus(r.Context(), string(body), user, accrualAddress)
+		serv.PollOrderStatus(r.Context(), string(body), user, accrualAddress)
 
 		w.WriteHeader(http.StatusAccepted)
 	}
