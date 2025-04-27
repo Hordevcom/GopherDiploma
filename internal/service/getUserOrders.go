@@ -7,6 +7,10 @@ import (
 	"github.com/Hordevcom/GopherDiploma/internal/models"
 )
 
+type GetOrder interface {
+	GetUserOrders(ctx context.Context, user string) ([]models.Order, error)
+}
+
 func (s Service) GetOrders(ctx context.Context, user string) ([]models.OrderFloat, error) {
 	orders, err := s.GetOrder.GetUserOrders(ctx, user)
 
